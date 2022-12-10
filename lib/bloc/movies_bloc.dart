@@ -9,22 +9,17 @@ part 'movies_state.dart';
 
 class MoviesBloc extends Bloc<MoviesEvent, MoviesState> {
   final ApiClient api;
-  MoviesBloc({required this.api}) : super(MoviesState()) {
-    on<LoadMovieEvent>((event, emit) => _loadMovies);
-  }
-
-  void _loadMovies(
-      LoadMovieEvent event, Emitter<LoadingMoviesState> emitter) async {
-    try {
-      final _apiClient = sl<ApiClient>();
-      List response = await _apiClient.getMovie();
-      List<Movie> listmovie = [];
-      for (int i = 0; i < response.length; i++) {
-        listmovie.add(Movie.fromJson(response[i]));
-        emit(SuccessMoviesState(listmovie));
-      }
-    } catch (e) {
-      emit(ErrorMoviesState('e'));
-    }
+  MoviesBloc({required this.api}) : super(InitialLoadingMoviesState()) {
+    on<LoadMovieEvent>(
+      (event, emit) async {
+        emit(LoadingMoviesState());
+        try {
+          List<Movie> movie = await api.getMovie();
+          emit(SuccessMoviesState(movie));
+        } catch (e) {
+          print(e);
+        }
+      },
+    );
   }
 }

@@ -1,10 +1,10 @@
 part of 'movies_bloc.dart';
 
-class MoviesState {}
-
-class LoadingMoviesState extends MoviesState {}
+abstract class MoviesState {}
 
 class InitialLoadingMoviesState extends MoviesState {}
+
+class LoadingMoviesState extends MoviesState {}
 
 class SuccessMoviesState extends MoviesState {
   final List<Movie> movies;

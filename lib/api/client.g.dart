@@ -12,7 +12,9 @@ class _ApiClient implements ApiClient {
   _ApiClient(
     this._dio, {
     this.baseUrl,
-  });
+  }) {
+    baseUrl ??= 'https://imdb-top-100-movies.p.rapidapi.com/';
+  }
 
   final Dio _dio;
 

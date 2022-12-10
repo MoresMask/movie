@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies2/api/client.dart';
 import 'package:movies2/bloc/movies_bloc.dart';
+import 'package:movies2/models/movie.dart';
 
 import 'locator.dart';
 
@@ -19,7 +20,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: MyHome(),
       builder: (context, child) => MultiBlocProvider(providers: [
-        BlocProvider(create: (context) => MoviesBloc(api: sl<ApiClient>())),
+        BlocProvider(
+          create: (context) => MoviesBloc(api: sl<ApiClient>()),
+        )
       ], child: child!),
     );
   }
@@ -30,29 +33,32 @@ class MyHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<MoviesBloc>(context);
-
-    return BlocProvider(
-      create: (context) => MoviesBloc(api: sl<ApiClient>()),
+    final movieBloc = MoviesBloc(api: sl<ApiClient>());
+    return Scaffold(
+        body: BlocProvider(
+      create: (context) => movieBloc..add(LoadMovieEvent()),
       child: BlocBuilder<MoviesBloc, MoviesState>(
         builder: (context, state) {
           if (state is LoadingMoviesState)
-            Center(
-              child: CircularProgressIndicator(),
-            );
+            return Center(child: CircularProgressIndicator());
+
           if (state is SuccessMoviesState) {
-            ListView.builder(
-              itemCount: state.movies.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [Text(state.movies[index].image.toString())],
-                );
-              },
-            );
+            return ListView.builder(
+                itemCount: 30,
+                itemBuilder: (context, index) {
+                  Movie movieList = state.movies[index];
+                  return ListTile(
+                    title:
+                        Image(image: NetworkImage(movieList.image.toString())),
+                  );
+                });
           }
-          return Container(color: Colors.red);
+          return Container(
+            color: Colors.amber,
+            child: Text('ERROR'),
+          );
         },
       ),
-    );
+    ));
   }
 }
